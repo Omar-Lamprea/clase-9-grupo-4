@@ -1,8 +1,56 @@
+import { useState } from "react";
+import Career from "./Components/Career";
 import "./styles.css";
 
 function App() {
-  function handleSubmit(event) {
-    event.preventDefault();
+  const [career, setCareer] = useState({
+    careerName: "",
+    grade: 0
+  })
+
+  const [careers, setCareers] = useState([
+    {
+      careerName: "Base de Datos",
+      value: "database",
+      cantStudents: 0,
+      average: [],
+    },
+    {
+      careerName: "Desarrollo Frontend",
+      value: "frontend",
+      cantStudents: 0,
+      average: [],
+    },
+    {
+      careerName: "Desarrollo Backend",
+      value: "backend",
+      cantStudents: 0,
+      average: [],
+    },
+    {
+      careerName: "DevOps",
+      value: "devops",
+      cantStudents: 0,
+      average: [],
+    }
+  ])
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if(career.careerName != ""){
+      const careerFilter = careers.filter((c) => c.value === career.careerName)
+      careerFilter[0].cantStudents ++
+      careerFilter[0].average.push(career.grade)
+
+      const newCareers = []
+      careers.forEach(c => {
+        c.value === career.careerName 
+          ? newCareers.push(careerFilter[0])
+          : newCareers.push(c)
+      });
+      setCareers(newCareers)
+      e.target.averageValue.value = ""
+    }
   }
 
   return (
@@ -10,16 +58,14 @@ function App() {
       <h1>Promedio de estudiantes por carrera</h1>
       <form className="form" onSubmit={handleSubmit}>
         <div className="container_input">
-          <select>
-            <option selected disabled>
-              Selecione una carrera
-            </option>
+          <select required defaultValue={'DEFAULT'} name="selectCarrer" onChange={(e) => setCareer({...career, careerName:e.target.value})}>
+            <option value="DEFAULT" disabled>Selecione una carrera</option>
             <option value="database">Base de Datos</option>
             <option value="backend">Desarrollo Backend</option>
             <option value="frontend">Desarrollo Frontend</option>
             <option value="devops">Devops</option>
           </select>
-          <input />
+          <input name="averageValue" placeholder="nota x estudiante: 0-10" required onChange={(e)=>{setCareer({...career, grade:parseInt(e.target.value)})}}/>
         </div>
         <input type="submit" value="Salvar" />
       </form>
@@ -34,23 +80,7 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Base de Datos</td>
-              <td>0</td>
-              <td>0</td>
-            </tr>
-
-            <tr>
-              <td>Desarrollo Frontend</td>
-              <td>0</td>
-              <td>0</td>
-            </tr>
-
-            <tr>
-              <td>Desarrollo Backend</td>
-              <td>0</td>
-              <td>0</td>
-            </tr>
+            {careers.map((c, i)=> <Career key={i} career={c}/>)}
           </tbody>
         </table>
       </div>
